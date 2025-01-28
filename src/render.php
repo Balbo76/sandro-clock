@@ -10,25 +10,32 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
-// Generates a unique id for aria-controls.
-$unique_id = wp_unique_id( 'clock-' );
-$ora = date('d/m/Y H:i:s');
-// Adds the global state.
+$now = getdate(time());
+
+$hours = $now['hours'];
+$minutes = $now['minutes'];
+$seconds = $now['seconds'];
+
+$context = [
+    'hours' => $hours,
+    'minutes' => $minutes,
+    'seconds' => $seconds,
+];
+
 wp_interactivity_state( 'sandro-clock', [
-    'ora'    => $ora
+    'hdeg' => "rotate(" . ($hours * 30 + $minutes * (360/720)) . "deg)",
+    'mdeg' => "rotate(" . ($minutes * 6 + $seconds * (360/3600)) . "deg)",
+    'sdeg' => "rotate(" . ($seconds * 6) . "deg)"
 ]);
 ?>
 
-<div <?php echo get_block_wrapper_attributes(); ?> data-wp-interactive="sandro-clock" data-wp-init="callbacks.initSandroClock" >
-    <div>
-        <div class="info date"></div>
-        <div class="info day"></div>
-    </div>
+<div <?php echo get_block_wrapper_attributes(); ?> data-wp-interactive="sandro-clock" data-wp-init="callbacks.initSandroClock"
+    <?php echo wp_interactivity_data_wp_context( $context ); ?> >
     <div class="dot"></div>
     <div>
-        <div class="hour-hand"></div>
-        <div class="minute-hand"></div>
-        <div class="second-hand"></div>
+        <div data-wp-style--transform="state.hdeg" class="hour-hand"></div>
+        <div data-wp-style--transform="state.mdeg" class="minute-hand"></div>
+        <div data-wp-style--transform="state.sdeg" class="second-hand"></div>
     </div>
     <div>
         <span class="h3">3</span>
